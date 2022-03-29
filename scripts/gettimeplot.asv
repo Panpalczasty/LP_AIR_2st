@@ -1,0 +1,26 @@
+clc 
+clear all
+close all
+
+name = "sin0-5_resp";
+path = "graphs/data/lab2/" + name + ".mat";
+
+src = open (path);
+
+endf = 3;
+
+u = src.PD_C.signals(4).values;
+v = src.PD_C.signals(2).values;
+t = src.PD_C.time;
+
+bi = 100;
+u = u(bi:end);
+v = v(bi:end,1);
+t = t(bi:end);
+
+
+figure(1);
+
+plot(t,v,'k');
+hold on;
+plot(t,2u,'b');

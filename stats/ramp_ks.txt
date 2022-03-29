@@ -1,0 +1,14 @@
+-------------------
+Slope - przekladnia - 0.00 
+-------------------
+Slope - przekladnia - 0.00 
+-------------------
+Slope - przekladnia - 0.00011 
+-------------------
+Slope - silnik - 0.00000 
+-------------------
+Slope - hamulec - 0.00476 
+-------------------
+Slope - walec - 0.00028 
+-------------------
+Slope - strefa-martwa - 0.00004 
