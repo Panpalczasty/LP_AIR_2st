@@ -3,12 +3,12 @@ clear all
 close all
 
 name = "pwm_low_freq_silnik_walec";
-path = "data/data/lab4/" + name + ".mat";
+path = "../data/data/lab4/" + name + ".mat";
 
 src = open (path);
 
-R = 1.977
-ke = 2.7e-3
+R = 3.964
+ke = 1.4e-3
 
 u = src.PD_C.signals(4).values;
 vs = src.PD_C.signals(2).values;
@@ -51,15 +51,17 @@ plot(i,"r");
 plot(di,'r--');
 legend("intensity", "intensity deriv");
 
-L = -(R*i+ke*v)./di;
+ia = i - ke/R*v 
 
 
 figure(3);
 hold on;
 grid;
-for i = 1:9
-    
-    Lpacket = L(640*i-620:640*i-540);
-    plot(Lpacket);
-    Lf(i) = mean(Lpacket)
-end
+plot(ia)
+
+% for i = 1:9
+%     
+%     Lpacket = L(640*i-620:640*i-540);
+%     plot(Lpacket);
+%     Lf(i) = mean(Lpacket)
+% end
