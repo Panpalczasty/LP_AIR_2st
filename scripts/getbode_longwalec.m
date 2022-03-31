@@ -164,9 +164,9 @@ end
 function sys = getTF()
         %% calc your D's
     si = [253.74 254.89 212.46 251.93 253.74]
-    R = 3.964
+    R = 1.977
     L = 0.5e-3
-    U = 24
+    U = 12
     ke = 2.7e-3;
     
     Di = (1./si - ke/U)*U/R
@@ -180,11 +180,11 @@ function sys = getTF()
     
     %% calc other params
     
-    J = sum(Ji) - 4*Ji(2);
-    D = sum(Di) - 4*Di(2);
+    J = sum(Ji) - 4*Ji(2)
+    D = sum(Di) - 4*Di(2)
     
     L = U;
     M = [L*J L*D+R*J R*D+ke];
     
-    sys = tf(L,M);
+    sys = tf(L,M)
 end

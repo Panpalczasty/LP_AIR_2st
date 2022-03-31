@@ -3,7 +3,7 @@ clear all
 close all
 
 type = "silnik";
-path = "graphs/data/lab3/ramp/stat_" + type + "_ramp_0-2_";
+path = "../data/data/lab3/ramp/stat_" + type + "_ramp_0-2_";
 
 up = open (path + "up.mat");
 down = open (path + "down.mat");
