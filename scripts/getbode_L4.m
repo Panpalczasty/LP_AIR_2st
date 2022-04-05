@@ -4,7 +4,7 @@ close all
 
 %get measurement data
 type = "silnik";
-path = "data/data/lab3/chirp/stat_" + type + "_chirp_0-1_do_3_hz";
+path = "../data/data/lab3/chirp/stat_" + type + "_chirp_0-1_do_3_hz";
 src = open (path + '.mat');
 
 u = src.PD_C.signals(4).values;
@@ -57,6 +57,11 @@ m45 = M(ind45);
 plotChirpFFT(u, win, w0);
 
 plotNyquist(d, type, ind45);
+
+figure(23);
+hold on;
+nyquist(getTF());
+
 
 plotBode(M, ph, w, type, ind45);
 
@@ -118,7 +123,7 @@ function plotNyquist(d, type, ind45)
     ylim([-nmax nmax]);
 
 
-    saveas(23, "plots/nyquist/" + type + '.png');
+    %saveas(23, "plots/nyquist/" + type + '.png');
 end
 
 function plotBode(M, ph, w, type, ind45)
@@ -147,5 +152,33 @@ function plotBode(M, ph, w, type, ind45)
     yticks([-180 -135 -90 -45 0 45 90]);
     xticks([0.1 0.2 0.5 1 2 5 10]);
 
-    saveas(4, "plots/bode2/" + type + '.png');
+    %saveas(4, "plots/bode2/" + type + '.png');
+end
+
+function sys = getTF()
+        %% calc your D's
+    si = [253.74 254.89 212.46 251.93 253.74]
+    R = 3.964
+    L = 0.5e-3
+    U = 24
+    ke = 2.7e-3;
+    
+    Di = (1./si - ke/U)*U/R
+    
+    %% and then your J's
+    
+    f45s = [0.6568 0.6270 0.5747 0.1065 0.5044];
+    w45s = 2*pi*f45s;
+    
+    Ji = 1./w45s .* (ke./(R+L*w45s) + (R-L*w45s)./(R+L*w45s).*Di);
+    
+    %% calc other params
+    
+    J = sum(Ji) - 4*Ji(2);
+    D = sum(Di) - 4*Di(2);
+    
+    L = U;
+    M = [L*J L*D+R*J R*D+ke];
+    
+    G = tf(L,M);
 end
