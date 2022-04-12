@@ -55,7 +55,7 @@ syscont = tf(Lm,Mm);
 Kp = 0.01;
 
 %deadbeat design 
-Tp = 2;
+Tp = 1;
 Gd = c2d(syscont, Tp);
 [Bm, Am] = tfdata(Gd,'v');
 P = flipud(Am);
@@ -66,48 +66,41 @@ Q(1) = sum(Bm);
 %For simplification - 
 
 %desired locus
-l0  = 10;
+l0  = 5;
 
-%matrix params
-a = 5
-b = 4.5
-c = 1/J*(D + ke/R)
-d = a/J*U/R 
+%big version non-viable -- large intensity feedback
+%using ackermann formula
 
-K1 = 1/(b*d)*(l0^3)
-K2 = 1/(b*d)*(-3*l0^2 + 3*l0*a - a^2)
-K3 = 1/d*(-3*l0 -b - a)
+%controllability matrix 
+C = [B A*B A^2*B A^3*B];
+%desired polynomial
+P = A^4 + 4*A^3*l0 + 6*A^2*l0^2 + 4*A*l0^3 + l0^4*eye(4,4);
 
+Kack = [0 0 0 1]*C^(-1)*P
+
+%loci for small version 
+a = 5;
+b = 4.5;
+c = 1/J*(ke/R+D);
+d = a/J*U/R;
+K1 = 1/(b*d)*(l0^3);
+K2 = 1/(b*d)*(3*l0^2-3*l0*a+a^2);
+K3 = 1/d*(-a-c+3*l0);
+K = [K1 K2 K3]
+
+Ar = [0 1 0; 0 -a b; 0 0 -c];
+Br = [0;0;d];
+
+% Cr = [Br Ar*Br Ar^2*Br];
+% Pr = Ar^3 + 3*Ar^2*l0 + 3*Ar*l0^2 + l0^3*eye(3,3);
+% Ksmul = [0 0 1]*Cr^(-1)*Pr
+
+smallsys = ss(Ar, Br, [1 0 0], 0);
 
 %% get model response
 
-% %get measurement data
-% type = "0-2";
-% path = "../data/data/lab2/sin" + type + "_resp";
-% src = open (path + '.mat');
-% 
-% u = src.PD_C.signals(4).values;
-% vs = src.PD_C.signals(2).values;
-% x = src.PD_C.signals(1).values;
-% t = src.PD_C.time;
-% i = src.PD_C.signals(3).values;
-% 
-% %crop beginning
-% bi = 50;
-% x = x(bi:end,2);
-% u = u(bi:end);
-% v = vs(bi:end,1); %encoder
-% v2 = vs(bi:end,3); %tacho
-% t = t(bi:end) - t(bi);
-% 
-% x0 = x(1);
-% v0 = v(1);
-% vo0 = v2(1);
-% i0 = i(bi,1);
-% 
-
-open ../models/model_linear.slx;
-sim ../models/model_linear.slx;
+open ../models/model_locreg.slx;
+sim ../models/model_locreg.slx;
 
 t_mod = ans.tout;
 y_mod = ans.output;
@@ -132,7 +125,7 @@ title("Model output");
 xlabel("Time [s]");
 ylabel("Position [rad]");
 legend("model output", "input signal");
-ylim([-1 160]);
+ylim([-1 180]);
 
 subplot(2,2,3);
 hold on;
@@ -165,3 +158,7 @@ ylabel("Value");
 ylim([-0.6 0.6]);
 %xlim([0 floor(t(end))]);
   
+
+
+
+

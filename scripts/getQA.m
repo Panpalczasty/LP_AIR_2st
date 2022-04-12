@@ -5,8 +5,7 @@ close all
 %% get object data 
 
 %get measurement data
-type = "walec";
-path = "../data/data/lab4/chirp_silnik_" + type + "_0-01_1_10minut";
+path = "../data/data/calosc_chirp";
 src = open (path + '.mat');
 
 u = src.PD_C.signals(4).values;
@@ -39,11 +38,11 @@ sfreq = 1/(t(2)-t(1));  %sampling frequency
 %frequency of chirp at the beginning and end of test
 [upeaks, i]  = findpeaks(u);
 di = diff(i);
-fmax = 1/(t(end) - t(end - di(end)))-0.15;
-fmin = 0.01;            %manual 
+fmax = 1/(t(end) - t(end - di(end)))-0.1;
+fmin = 1/(t(1+di(1)) - t(1))-0.02;            %manual 
 
 %time window - Tukey, crop ends of chirp
-win = tukeywin(T*sfreq+1,0.15);
+win = tukeywin(T*sfreq+1,0.05);
 
 %Perform FFT
 uf = fft(u.*win);
@@ -84,10 +83,18 @@ function plotMetrics(w ,Gmod, Gref, id)
     % Phase model shift
     phs = pmod - pref;
     
+    nacc = decimate(nacc, 3);
+    w = decimate(w,3);
+    macc = decimate(macc, 3);
+    phs = decimate(phs,3);
+
     modl = "\hat{G}(i\omega)";
     refl = "G(i\omega)";
 
-    figure(id)
+    f = figure(id)
+    f.Position = [00 0 1000 1000]
+    
+
     subplot(3,1,1)
     semilogx(w, 20*log10(nacc), 'k-', "LineWidth", 1.5);
     grid;
@@ -135,8 +142,9 @@ function plotBode(w, Gmod, Gref, id)
     pmod(pmod > 90) = pmod(pmod > 90) - 360;
     pref(pref > 90) = pref(pref > 90) - 360;
 
-    figure(id);
-    
+    f = figure(id);
+    f.Position = [0 0 1000 500]
+
     subplot(2,1,1);
     semilogx(w, Mref, 'k-', "LineWidth", 1.5);
     hold on;
