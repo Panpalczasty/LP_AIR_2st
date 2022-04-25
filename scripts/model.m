@@ -26,15 +26,15 @@ D = sum(Di) - 4*Di(2);
 Lo = U;
 Mo = [L*J L*D+R*J R*D+ke];
 
-G = tf(Lo,Mo)
+G = tf(Lo,Mo);
 
 dz_width = 0.2; %amps
-b_width = 1.9*pi; %rads
+dz_lin = 0.975;
 
 %% get model response
 
 %get measurement data
-type = "20";
+type = "0-2";
 path = "../data/data/lab2/sin" + type + "_resp";
 src = open (path + '.mat');
 
@@ -44,21 +44,26 @@ x = src.PD_C.signals(1).values;
 t = src.PD_C.time;
 i = src.PD_C.signals(3).values;
 
+figure(3);
+plot(t, i(:,1));
+grid;
+
 %crop beginning
-bi = 200;
+bi = 50;
 x = x(bi:end,2);
 u = u(bi:end);
-v = vs(bi:end,1);
-v2 = vs(bi:end,3);
+v = vs(bi:end,1); %encoder
+v2 = vs(bi:end,3); %tacho
 t = t(bi:end) - t(bi);
 
 x0 = x(1);
 v0 = v(1);
-e0 = (v(1+1)-v(1))/(t(end)-t(end-1));
+vo0 = v2(1);
 i0 = i(bi,1);
 
 T = t(end);
 u_tosim = [t u];
+v_tosim = [t v];
 
 open ../models/model_full.slx;
 sim ../models/model_full.slx;
@@ -66,64 +71,81 @@ sim ../models/model_full.slx;
 x_mod = ans.position.signals.values;
 v_mod = ans.velocity.signals.values;
 t_mod = ans.tout;
+err = ans.error;
+vref = ans.vref;
 
-figure(1);
+%% calcs
+%TODO
+N = length(err);
 
+% mean relative error - says nothing here 
+% mre = 1/N*sum(abs(err+1)./abs(vref+1));
+
+% mean abs err
+mabs = 1/N*sum(abs(err))
+
+% mean error
+merr = N*mabs* 1./sum(abs(vref))
+
+acc = 100*(1-merr)
+
+% root mean square error 
+rms = sqrt(1/N*sum(err.^2))
+
+%% plots
+f = figure(1);
+f.Position = [600 0 1000 900];
+
+%TODO
+%velocity plots
 subplot(3,1,1);
 hold on;
-plot(t, x, 'k');
-plot(t_mod, x_mod, 'b--');
-grid;
-title("Position");
-xlabel("Time [s]");
-ylabel("Position [rad]");
-legend("object", "model");
-
-subplot(3,1,2);
-hold on;
-plot(t, v, 'k');
-plot(t, v2, 'r')
-plot(t_mod, v_mod, 'b--');
+plot(t_mod, v_mod, 'b-', "LineWidth", 1.5);
+plot(t, v, 'k--');
+%plot(t, v2, 'r')
 grid;
 title("Velocity");
 xlabel("Time [s]");
 ylabel("Velocity [rad/s]");
-legend("object","tacho", "model");
+legend("object", "model");
+xlim([0 floor(t(end))])
 
-subplot(3,1,3);
-plot(t, u, 'r');
+%input plots
+subplot(3,1,2);
+plot(t, u, 'k');
 hold on;
 grid;
 title("Input");
 xlabel("Time [s]");
 ylabel("Value");
+xlim([0 floor(t(end))])
+ylim([-1.2 1.2]);
 
-%% plot modelling error
+%velocity error plot
+subplot(3,1,3);
+plot(t_mod, err, 'k')
+hold on;
+title("Error");
+xlabel("Time [s]");
+ylabel("Value");
+grid;
+xlim([0 floor(t(end))])
+%ylim([-50 50]);
+%%
 
-errx = abs(x_mod - x);
-errv = abs(v_mod - v);
+txt = sprintf('Mean absolute error: %.2f', mabs) + " rad/s";
+txt2 = sprintf('RMS: %.2f', rms) + " rad/s";
 
-figure(2)
-subplot(2,1,1);
-plot(t,errx, "r-");
-xlabel("Time[s]");
-ylabel("Error value [%]");
-title("Position error");
+%text(1,45,txt, "FontSize", 12);
+%text(4,45,txt2, "FontSize", 12);
 
-subplot(2,1,2);
-plot(t, errv, "r-");
-xlabel("Time[s]");
-ylabel("Error value [%]");
-title("Velocity error");
+saveas(1,"../plots/model/model_" + type + ".png");
 
-
-
-
-
-
-
-
-
+f = fopen("../stats/stats_model.txt", 'a');
+fprintf(f,"-------------------\n");
+fprintf(f,"type,mabs,rms,merr,acc\n");
+fprintf(f,"%s,%.2f,%.2f,%.2f,%.2f\n", type, mabs, rms, merr, acc);
+fclose(f);
 
 
 
