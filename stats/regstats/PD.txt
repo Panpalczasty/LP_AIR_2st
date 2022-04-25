@@ -1,0 +1,5 @@
+-------------------
+PD
+Regulation time (0.02) = 3.74 [s]
+Integral of square of error = 28727.031 
+Integral of square of control = 0.438 

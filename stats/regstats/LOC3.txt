@@ -1,0 +1,20 @@
+-------------------
+LOC3
+Regulation time (0.02) = 6.88 [s]
+Integral of square of error = 29219.383 
+Integral of square of control = 0.469 
+-------------------
+LOC3
+Regulation time (0.02) = 6.88 [s]
+Integral of square of error = 29219.383 
+Integral of square of control = 0.462 
+-------------------
+LOC3
+Regulation time (0.02) = 6.88 [s]
+Integral of square of error = 29219.383 
+Integral of square of control = 0.453 
+-------------------
+LOC3
+Regulation time (0.02) = 4.88 [s]
+Integral of square of error = 29219.383 
+Integral of square of control = 0.455 
