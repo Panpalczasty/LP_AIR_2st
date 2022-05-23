@@ -27,17 +27,17 @@ dz_width = 0.2; %amps
 a = 0.975;
 
 %define dem matrices
-<<<<<<< HEAD
+%<<<<<<< HEAD
 A = [0  1  0    0;      %predkosc
      0 -5  4.5  0;      %strefa martwa
      0  0 -D/J  a/J;    %czesc mechaniczna
      0  0 -ke/L -R/L];  %czesc elektryczna
-=======
+%=======
 A = [0  1  0    0;
      0 -5  4.5  0;
      0  0 -D/J  a/J;
      0  0 -ke/L -R/L];
->>>>>>> 6b25ce00dc157cdf4cebd84476acedf844c1427f
+%>>>>>>> 6b25ce00dc157cdf4cebd84476acedf844c1427f
 
 B = [0;0;0;U/L];
 C = [1 0 0 0];
@@ -73,14 +73,10 @@ Q(1) = sum(Bm);
 %For simplification - 
 
 %desired locus
-l0  = 5;
+l0  = 1;
 
 %big version non-viable -- large intensity feedback
 %using ackermann formula
-<<<<<<< HEAD
-=======
-
->>>>>>> 6b25ce00dc157cdf4cebd84476acedf844c1427f
 %controllability matrix 
 C = [B A*B A^2*B A^3*B];
 %desired polynomial
