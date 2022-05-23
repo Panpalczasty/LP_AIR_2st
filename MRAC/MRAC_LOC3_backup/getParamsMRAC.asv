@@ -1,0 +1,47 @@
+function p = getParamsMRAC(T, K, Q, gamma_x, gamma_w)
+%GETPARAMSMRAC Get params for MRAC Controller
+%   Calculates and outputs default parameters for Simulink model
+%   params:
+%       K - desired static gain
+%       T - desired time constant
+%       Q - tracking error weight
+%       gamma - learning rate
+%   Reference model is a first-order object with time constant T and 
+%   static gain K
+
+% Reference model G(s) = K/(Ts+1)^3
+Num = K;
+Den = [T^4 4*T^3 6*T^2 4*T 1];
+[Am, Bm, Cm, ~] = tf2ss(Num, Den);
+
+p.Am = rot90(Am,2);
+p.Bm = flipud(Bm)*max(Cm);
+
+
+% "True" model - 
+p.A = [ 0  1  0    0;
+        0 -5  4.5  0;
+        0  0 -0.7108*2  2*23.6012;
+        0  0 -5.3898 -4040];
+
+p.B = [ 0;0;0;2.59e4];
+
+% Regulators - learning rate 
+% u(t) = Kr*r(t) + Kx*x(t) - u_ad
+p.Kx = -place(p.A,p.B,eig(p.Am)); % State feedback gain for pole placement
+
+p.Kr = max(p.Bm);          % Feedforward gain for ref model matching
+
+p.gamma_x = gamma_x;       % Feedback gain learning rate
+
+% Uncertainty parameters (u_ad - estimate) 
+% u_ad = w'*Q
+p.Q = Q.*eye(4);                     % tracking error weight
+p.gamma_w = gamma_w;         % uncertainty learning rate
+
+% Solve Lyapunov equatton for given A and Q
+
+p.P = sylvester(p.Am', p.Am, -p.Q);
+
+end
+
