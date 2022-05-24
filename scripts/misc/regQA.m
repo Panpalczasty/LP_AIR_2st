@@ -4,10 +4,10 @@ close all
 
 % get regulator quality assessment
 % % regtypes PD/LQR/MPC/DB/LOC3/LOC4
-% regtype = "LOC3";
-% enable = true;
-% regtype = "PD";
-% enable = false;
+%regtype = "LOC3";
+%enable = true;
+%regtype = "PD";
+%enable = false;
 regtype = "DB";
 enable = true;
 
@@ -60,12 +60,12 @@ xmod = ans.output;
 %% calculate regulation QA params
 
 % regulation time (2%)
+%[~, locs] = findpeaks(-abs(err-0.02*x(end)));
+%regtime = t(locs(end));
+%regerr = err(locs(end));
 [peaks, locs] = findpeaks(-abs(err-0.02*x(end)));
 regtime = t(locs(end));
-regerr = err(locs(end));
-[peaks, locs] = findpeaks(-abs(err-0.02));
-regtime = t(locs(2));
-regerr = peaks(2);
+regerr = peaks(end);
 
 % energy coefficient
 dt = t(2)-t(1);
@@ -75,7 +75,26 @@ intu = dt*sum(u.^2);
 err2 = err(1:locs(end));
 intx = dt*sum(err2.^2);
 % int of square of error 
-intx = dt*sum(err.^2);
+intx = dt*sum(err.^2)/(xref(end)^2);
+
+%% regulation params of model
+
+% regulation time (2%)
+%[~, locs] = findpeaks(-abs(err-0.02*x(end)));
+%regtime = t(locs(end));
+%regerr = err(locs(end));
+[peaks, locs] = findpeaks(-abs((xref-xmod)-0.02*xmod(end)));
+regtimem = t(locs(end));
+regerrm = peaks(end);
+
+% energy coefficient
+dt = t(2)-t(1);
+intum = dt*sum(umod.^2);
+
+% int of square of error
+err2 = err(1:locs(end));
+% int of square of error 
+intxm = dt*sum((xmod-xref).^2)/(xref(end)^2);
 
 %% plot comparison plot
 f = figure(1);
@@ -136,7 +155,7 @@ if enable
 end
 
 function saveStats(regtype, intu, intx, regtime)
-    path = "../stats/regstats/" + regtype + ".txt";
+    path = "../../stats/regstats/" + regtype + ".txt";
     g = fopen(path, 'a');
     fprintf(g,"-------------------\n");
     fprintf(g, regtype);
@@ -151,8 +170,8 @@ function saveStats(regtype, intu, intx, regtime)
     fprintf(g,"%.3f \n", intu);
 
     fclose(g);
-    path = "stats/regstats/" + regtype + ".txt"
-    f = fopen(path, 'w');
+    path = "../../stats/regstats/" + regtype + ".txt"
+    f = fopen(path, 'a');
     fprintf(f,"-------------------\n");
     fprintf(f, regtype);
     fprintf(f, "\n");
