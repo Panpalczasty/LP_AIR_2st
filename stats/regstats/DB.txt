@@ -1,0 +1,10 @@
+-------------------
+DB
+Regulation time (0.02) = 18.80 [s]
+Integral of square of error = 2.578 
+Integral of square of control = 1.345 
+-------------------
+DB
+Regulation time (0.02) = 18.80 [s]
+Integral of square of error2.578 
+Integral of square of control1.345 
